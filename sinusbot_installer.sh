@@ -450,6 +450,23 @@ if [ "$INSTALL" == "Rem" ]; then
         rm /etc/cron.d/ytdl
       fi
 
+      greenMessage "Removed YT-DL successfully"!
+    fi
+  fi
+
+  if [[ -f /usr/local/bin/yt-dlp ]]; then
+    redMessage "Remove YoutubeDLP?"
+
+    OPTIONS=("Yes" "No")
+    select OPTION in "${OPTIONS[@]}"; do
+      case "$REPLY" in
+      1 | 2) break ;;
+      *) errorContinue ;;
+      esac
+    done
+
+    if [ "$OPTION" == "Yes" ]; then
+
       if [[ -f /usr/local/bin/yt-dlp ]]; then
         rm /usr/local/bin/yt-dlp
       fi
@@ -458,7 +475,7 @@ if [ "$INSTALL" == "Rem" ]; then
         rm /etc/cron.d/ytdlp
       fi
 
-      greenMessage "Removed YT-DL / YT-DLP successfully"!
+      greenMessage "Removed YT-DLP successfully"!
     fi
   fi
 
@@ -557,34 +574,22 @@ select OPTION in "${OPTIONS[@]}"; do
   esac
 done
 
-# Ask for YT-DL
+# Ask for YT-DL | YT-DLP
 
-redMessage "Should YT-DL be installed/updated?"
-OPTIONS=("Yes" "No")
+redMessage "Should YT-DL or YT-DLP be installed/updated?"
+OPTIONS=("Yes, YT-DL Install", "Yes, YT-DLP Install", "No")
 select OPTION in "${OPTIONS[@]}"; do
   case "$REPLY" in
-  1 | 2) break ;;
+  1 | 2 | 3) break ;;
   *) errorContinue ;;
   esac
 done
 
-if [ "$OPTION" == "Yes" ]; then
+if [ "$OPTION" == "Yes, YT-DL Install" ]; then
   YT="Yes"
 fi
 
-
-# Ask for YT-DLP
-
-redMessage "Should YT-DLP be installed/updated?"
-OPTIONS=("Yes" "No")
-select OPTION in "${OPTIONS[@]}"; do
-  case "$REPLY" in
-  1 | 2) break ;;
-  *) errorContinue ;;
-  esac
-done
-
-if [ "$OPTION" == "Yes" ]; then
+if [ "$OPTION" == "Yes, YT-DLP Install" ]; then
   YTDLP="Yes"
 fi
 
