@@ -4,7 +4,7 @@
 # Vars
 
 MACHINE=$(uname -m)
-Instversion="1.5"
+Instversion="1.6"
 
 USE_SYSTEMD=true
 
@@ -51,7 +51,7 @@ function makeDir() {
 }
 
 err_report() {
-  FAILED_COMMAND=$(wget -q -O - https://raw.githubusercontent.com/Sinusbot/installer-linux/master/sinusbot_installer.sh | sed -e "$1q;d")
+  FAILED_COMMAND=$(wget -q -O - https://raw.githubusercontent.com/mirarus/sinusbot-installer-linux/master/sinusbot_installer.sh | sed -e "$1q;d")
   FAILED_COMMAND=${FAILED_COMMAND/ -qq}
   FAILED_COMMAND=${FAILED_COMMAND/ -q}
   FAILED_COMMAND=${FAILED_COMMAND/ -s}
@@ -59,7 +59,7 @@ err_report() {
   FAILED_COMMAND=${FAILED_COMMAND/ 2\>&1}
   FAILED_COMMAND=${FAILED_COMMAND/ \>\/dev\/null}
   if [[ "$FAILED_COMMAND" == "" ]]; then
-    redMessage "Failed command: https://github.com/Sinusbot/installer-linux/blob/master/sinusbot_installer.sh#L""$1"
+    redMessage "Failed command: https://github.com/mirarus/sinusbot-installer-linux/blob/master/sinusbot_installer.sh#L""$1"
   else
     redMessage "Command which failed was: \"${FAILED_COMMAND}\". Please try to execute it manually and attach the output to the bug report in the forum thread."
     redMessage "If it still doesn't work report this to the author at https://forum.sinusbot.com/threads/sinusbot-installer-script.1200/ only. Not a PN or a bad review, cause this is an error of your system not of the installer script. Line $1."
@@ -450,7 +450,15 @@ if [ "$INSTALL" == "Rem" ]; then
         rm /etc/cron.d/ytdl
       fi
 
-      greenMessage "Removed YT-DL successfully"!
+      if [[ -f /usr/local/bin/yt-dlp ]]; then
+        rm /usr/local/bin/yt-dlp
+      fi
+
+      if [[ -f /etc/cron.d/ytdlp ]]; then
+        rm /etc/cron.d/ytdlp
+      fi
+
+      greenMessage "Removed YT-DL / YT-DLP successfully"!
     fi
   fi
 
@@ -562,6 +570,22 @@ done
 
 if [ "$OPTION" == "Yes" ]; then
   YT="Yes"
+fi
+
+
+# Ask for YT-DLP
+
+redMessage "Should YT-DLP be installed/updated?"
+OPTIONS=("Yes" "No")
+select OPTION in "${OPTIONS[@]}"; do
+  case "$REPLY" in
+  1 | 2) break ;;
+  *) errorContinue ;;
+  esac
+done
+
+if [ "$OPTION" == "Yes" ]; then
+  YTDLP="Yes"
 fi
 
 # Update packages or not
@@ -950,6 +974,43 @@ if [ "$YT" == "Yes" ]; then
   chmod a+rx /usr/local/bin/youtube-dl
 
   youtube-dl -U --restrict-filename
+
+fi
+
+# Installing YT-DLP.
+
+if [ "$YTDLP" == "Yes" ]; then
+  greenMessage "Installing YTDLP-Downloader now"!
+  if [ "$(cat /etc/cron.d/ytdlp)" == "0 0 * * * $SINUSBOTUSER yt-dlp -U --restrict-filename >/dev/null" ]; then
+        rm /etc/cron.d/ytdlp
+        yellowMessage "Deleted old YT-DL cronjob. Generating new one in a second."
+  fi
+  if [[ -f /etc/cron.d/ytdl ]] && [ "$(grep -c 'youtube' /etc/cron.d/ytdlp)" -ge 1 ]; then
+    redMessage "Cronjob already set for YT-DLP updater"!
+  else
+    greenMessage "Installing Cronjob for automatic YT-DLP update..."
+    echo "0 0 * * * $SINUSBOTUSER PATH=$PATH:/usr/local/bin; yt-dlp -U --restrict-filename >/dev/null" >>/etc/cron.d/ytdl
+    greenMessage "Installing Cronjob successful."
+  fi
+
+  sed -i 's/YoutubeDLPath = \"\"/YoutubeDLPath = \"\/usr\/local\/bin\/yt-dlp\"/g' $LOCATION/config.ini
+
+  if [[ -f /usr/local/bin/yt-dlp ]]; then
+    rm /usr/local/bin/yt-dlp
+  fi
+
+  greenMessage "Downloading YT-DLP now..."
+  wget -q -O /usr/local/bin/yt-dlp https://github.com/yt-dlp/yt-dlp/releases/download/2022.08.19/yt-dlp
+
+  if [ ! -f /usr/local/bin/yt-dlp ]; then
+    errorExit "Download failed! Exiting now"!
+  else
+    greenMessage "Download successful"!
+  fi
+
+  chmod a+rx /usr/local/bin/yt-dlp
+
+  yt-dlp -U --restrict-filename
 
 fi
 
