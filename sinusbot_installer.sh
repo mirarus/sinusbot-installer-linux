@@ -455,7 +455,7 @@ if [ "$INSTALL" == "Rem" ]; then
   fi
 
   if [[ -f /usr/local/bin/yt-dlp ]]; then
-    redMessage "Remove YoutubeDLP?"
+    redMessage "Remove Youtube-DLP?"
 
     OPTIONS=("Yes" "No")
     select OPTION in "${OPTIONS[@]}"; do
