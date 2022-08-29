@@ -577,7 +577,7 @@ done
 # Ask for YT-DL | YT-DLP
 
 redMessage "Should YT-DL or YT-DLP be installed/updated?"
-OPTIONS=("Yes, YT-DL Install", "Yes, YT-DLP Install", "No")
+OPTIONS=("Yes, YT-DL Install" "Yes, YT-DLP Install" "No")
 select OPTION in "${OPTIONS[@]}"; do
   case "$REPLY" in
   1 | 2 | 3) break ;;
