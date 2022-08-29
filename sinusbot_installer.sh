@@ -593,6 +593,28 @@ if [ "$OPTION" == "Yes, YT-DLP Install" ]; then
   YTDLP="Yes"
 fi
 
+# Ask for TeamSpeak Version
+
+if [ "$DISCORD" == "false" ]; then
+
+  redMessage "Select TeamSpeak client version"
+  OPTIONS=("3.1.10" "3.5.3")
+  select OPTION in "${OPTIONS[@]}"; do
+    case "$REPLY" in
+    1 | 2) break ;;
+    *) errorContinue ;;
+    esac
+  done
+
+  if [ "$OPTION" == "3.1.10" ]; then
+    TSCV="3.1.10"
+  fi
+
+  if [ "$OPTION" == "3.5.3" ]; then
+    TSCV="3.5.3"
+  fi
+fi
+
 # Update packages or not
 
 redMessage 'Update the system packages to the latest version? (Recommended)'
@@ -629,9 +651,9 @@ if [ "$DISCORD" == "false" ]; then
 
 greenMessage "Searching latest TS3-Client build for hardware type $MACHINE with arch $ARCH."
 
-VERSION="3.5.3"
+VERSION=$TSCV
 
-DOWNLOAD_URL_VERSION="https://files.teamspeak-services.com/releases/client/$VERSION/TeamSpeak3-Client-linux_$ARCH-$VERSION.run"
+DOWNLOAD_URL_VERSION="https://dl.4players.de/ts/releases/$VERSION/TeamSpeak3-Client-linux_$ARCH-$VERSION.run"
  STATUS=$(wget --server-response -L $DOWNLOAD_URL_VERSION 2>&1 | awk '/^  HTTP/{print $2}')
   if [ "$STATUS" == "200" ]; then
     DOWNLOAD_URL=$DOWNLOAD_URL_VERSION
@@ -823,31 +845,56 @@ fi
 
 cd $LOCATION
 
-greenMessage "Downloading latest SinusBot."
+if [[ $VERSION == '3.1.10' && "$DISCORD" == "false" ]]; then
 
-su -c "wget -q https://www.sinusbot.com/dl/sinusbot.current.tar.bz2" $SINUSBOTUSER
-if [[ ! -f sinusbot.current.tar.bz2 && ! -f sinusbot ]]; then
-  errorExit "Download failed! Exiting now"!
+  greenMessage "Downloading SinusBot 1.0.0 Alpha 4"
+
+  su -c "wget -q https://www.sinusbot.com/pre/sinusbot-1.0.0-alpha.4-311d85f.tar.bz2" $SINUSBOTUSER
+  if [[ ! -f sinusbot-1.0.0-alpha.4-311d85f.tar.bz2 && ! -f sinusbot ]]; then
+    errorExit "Download failed! Exiting now"!
+  fi
+
+  # Installing latest SinusBot.
+
+  greenMessage "Extracting SinusBot files."
+  su -c "tar -xjf sinusbot-1.0.0-alpha.4-311d85f.tar.bz2" $SINUSBOTUSER
+  rm -f sinusbot-1.0.0-alpha.4-311d85f.tar.bz2
+
+  if [ ! -d teamspeak3-client/plugins/ ]; then
+     mkdir teamspeak3-client/plugins/
+  fi
+
+  # Copy the SinusBot plugin into the teamspeak clients plugin directory
+  cp $LOCATION/plugin/libsoundbot_plugin.so $LOCATION/teamspeak3-client/plugins/
 fi
+if [ $VERSION == '3.5.3' ]; then
 
-# Installing latest SinusBot.
+  greenMessage "Downloading latest SinusBot."
 
-greenMessage "Extracting SinusBot files."
-su -c "tar -xjf sinusbot.current.tar.bz2" $SINUSBOTUSER
-rm -f sinusbot.current.tar.bz2
+  su -c "wget -q https://www.sinusbot.com/dl/sinusbot.current.tar.bz2" $SINUSBOTUSER
+  if [[ ! -f sinusbot.current.tar.bz2 && ! -f sinusbot ]]; then
+    errorExit "Download failed! Exiting now"!
+  fi
 
-if [ "$DISCORD" == "false" ]; then
+  # Installing latest SinusBot.
 
-if [ ! -d teamspeak3-client/plugins/ ]; then
-  mkdir teamspeak3-client/plugins/
-fi
+  greenMessage "Extracting SinusBot files."
+  su -c "tar -xjf sinusbot.current.tar.bz2" $SINUSBOTUSER
+  rm -f sinusbot.current.tar.bz2
 
-# Copy the SinusBot plugin into the teamspeak clients plugin directory
-cp $LOCATION/plugin/libsoundbot_plugin.so $LOCATION/teamspeak3-client/plugins/
+  if [ "$DISCORD" == "false" ]; then
 
-if [[ -f teamspeak3-client/xcbglintegrations/libqxcb-glx-integration.so ]]; then
-  rm teamspeak3-client/xcbglintegrations/libqxcb-glx-integration.so
-fi
+    if [ ! -d teamspeak3-client/plugins/ ]; then
+      mkdir teamspeak3-client/plugins/
+    fi
+
+    # Copy the SinusBot plugin into the teamspeak clients plugin directory
+    cp $LOCATION/plugin/libsoundbot_plugin.so $LOCATION/teamspeak3-client/plugins/
+
+    if [[ -f teamspeak3-client/xcbglintegrations/libqxcb-glx-integration.so ]]; then
+      rm teamspeak3-client/xcbglintegrations/libqxcb-glx-integration.so
+    fi
+  fi
 fi
 
 chmod 755 sinusbot
@@ -970,7 +1017,7 @@ if [ "$YT" == "Yes" ]; then
   greenMessage "Downloading YT-DL now..."
   wget -q -O /usr/local/bin/youtube-dl http://yt-dl.org/downloads/latest/youtube-dl
 
-  if [ ! -f /usr/local/bin/youtube-dl ]; then
+  if [[ ! -f /usr/local/bin/youtube-dl ]]; then
     errorExit "Download failed! Exiting now"!
   else
     greenMessage "Download successful"!
@@ -990,11 +1037,11 @@ if [ "$YTDLP" == "Yes" ]; then
         rm /etc/cron.d/ytdlp
         yellowMessage "Deleted old YT-DL cronjob. Generating new one in a second."
   fi
-  if [[ -f /etc/cron.d/ytdl ]] && [ "$(grep -c 'youtube' /etc/cron.d/ytdlp)" -ge 1 ]; then
+  if [[ -f /etc/cron.d/ytdlp ]] && [ "$(grep -c 'yt' /etc/cron.d/ytdlp)" -ge 1 ]; then
     redMessage "Cronjob already set for YT-DLP updater"!
   else
     greenMessage "Installing Cronjob for automatic YT-DLP update..."
-    echo "0 0 * * * $SINUSBOTUSER PATH=$PATH:/usr/local/bin; yt-dlp -U --restrict-filename >/dev/null" >>/etc/cron.d/ytdl
+    echo "0 0 * * * $SINUSBOTUSER PATH=$PATH:/usr/local/bin; yt-dlp -U --restrict-filename >/dev/null" >>/etc/cron.d/ytdlp
     greenMessage "Installing Cronjob successful."
   fi
 
@@ -1007,7 +1054,7 @@ if [ "$YTDLP" == "Yes" ]; then
   greenMessage "Downloading YT-DLP now..."
   wget -q -O /usr/local/bin/yt-dlp https://github.com/yt-dlp/yt-dlp/releases/download/2022.08.19/yt-dlp
 
-  if [ ! -f /usr/local/bin/yt-dlp ]; then
+  if [[ ! -f /usr/local/bin/yt-dlp ]]; then
     errorExit "Download failed! Exiting now"!
   else
     greenMessage "Download successful"!
