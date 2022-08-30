@@ -1,6 +1,6 @@
 # SinusBot Installer for Linux
 
-![Build Status](https://github.com/sinusbot/installer-linux/workflows/CI/badge.svg)
+![Build Status](https://github.com/mirarus/sinusbot-installer-linux/workflows/CI/badge.svg)
 
 ## Officially supported Linux distributions
 
@@ -14,6 +14,7 @@
   - Automatic = /opt/sinusbot
   - or own dir
 - Update the SinusBot and youtube-dl
+- Add yt-dlp
 - Reset the password
 - Uninstall the bot
 
@@ -25,7 +26,9 @@ The following tasks will be done:
 - Creates a separated user
 - Installs the latest SinusBot version
 - Installs youtube-dl
+- Installs yt-dlp
 - Adds a cronjob for daily youtube-dl update
+- Adds a cronjob for daily yt-dlp update
 - Sets all the file permissions correctly
 - Generates startup files:
   - systemd file => `service sinusbot {start|stop|restart|status}`
@@ -42,7 +45,7 @@ The duration of the installation process depends on your system (how many packag
 ## Installation
 
 ```bash
-bash <(wget --no-check-certificate -O - 'https://raw.githubusercontent.com/SinusBot/installer-linux/master/sinusbot_installer.sh')
+bash <(wget --no-check-certificate -O - 'https://raw.githubusercontent.com/mirarus/sinusbot-installer-linux/master/sinusbot_installer.sh')
 ```
 
 This command basically downloads the latest version of the installer-script and executes it via the bash.
