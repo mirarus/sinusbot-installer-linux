@@ -61,8 +61,7 @@ err_report() {
   if [[ "$FAILED_COMMAND" == "" ]]; then
     redMessage "Failed command: https://github.com/Sinusbot/installer-linux/blob/master/sinusbot_installer.sh#L""$1"
   else
-    redMessage "Command which failed was: \"${FAILED_COMMAND}\". Please try to execute it manually and attach the output to the bug report in the forum thread."
-    redMessage "If it still doesn't work report this to the author at https://forum.sinusbot.com/threads/sinusbot-installer-script.1200/ only. Not a PN or a bad review, cause this is an error of your system not of the installer script. Line $1."
+    redMessage "Command which failed was: \"${FAILED_COMMAND}\". Please try to exfecute it manually and attach the output to the bug report in the forum thread."
   fi
   exit 1
 }
@@ -76,7 +75,7 @@ fi
 
 # Update notify
 
-cyanMessage "Checking for the latest installer version"
+redMessage "Checking for the latest installer version"
 if [[ -f /etc/centos-release ]]; then
   yum -y -q install wget
 else
@@ -88,23 +87,12 @@ if [[ $(command -v systemctl) == "" ]]; then
   USE_SYSTEMD=false
 fi
 
-# If kernel to old, quit
-if [ $(uname -r | cut -c1-1) < 3 ]; then
-  errorExit "Linux kernel unsupportet. Update kernel before. Or change hardware."
-fi
-
 # If the linux distribution is not debian and centos, then exit
 if [ ! -f /etc/debian_version ] && [ ! -f /etc/centos-release ]; then
   errorExit "Not supported linux distribution. Only Debian and CentOS are currently supported"!
 fi
 
-greenMessage "This is the automatic installer for latest SinusBot. USE AT YOUR OWN RISK"!
-sleep 1
-cyanMessage "You can choose between installing, upgrading and removing the SinusBot."
-sleep 1
-redMessage "Installer by Philipp Esswein | DAThosting.eu - Your game-/voiceserver hoster (only german)."
-sleep 1
-magentaMessage "Please rate this script at: https://forum.sinusbot.com/resources/sinusbot-installer-script.58/"
+cyanMessage "Installer by Mirarus"
 sleep 1
 yellowMessage "You're using installer $Instversion"
 
@@ -278,14 +266,7 @@ LOCATIONex=$LOCATION/sinusbot
 if [[ $INSTALL == "Inst" ]]; then
 
   if [[ -f $LOCATION/sinusbot ]]; then
-    redMessage "SinusBot already installed with automatic install option"!
-    read -rp "Would you like to update the bot instead? [Y / N]: " OPTION
-
-    if [ "$OPTION" == "Y" ] || [ "$OPTION" == "y" ] || [ "$OPTION" == "" ]; then
       INSTALL="Updt"
-    elif [ "$OPTION" == "N" ] || [ "$OPTION" == "n" ]; then
-      errorExit "Installer stops now"!
-    fi
   else
     greenMessage "SinusBot isn't installed yet. Installer goes on."
   fi
@@ -438,11 +419,11 @@ fi
   else
     # Detect if systemctl is available then use systemd as start script. Otherwise use init.d
     if [ "$OSRELEASE" == "18.04" ] && [ "$OS" == "ubuntu" ]; then
-      apt-get -y install chrony
+      apt-get -y install chrony >/dev/null
     else
-      apt-get -y install ntp
+      apt-get -y install ntp >/dev/null
     fi
-    apt-get -y -qq install libfontconfig libxtst6 screen xvfb libxcursor1 ca-certificates bzip2 psmisc libglib2.0-0 less cron-apt python python3 iproute2 dbus libnss3 libegl1-mesa x11-xkb-utils libasound2 libxcomposite-dev libxi6 libpci3 libxslt1.1 libxkbcommon0 libxss1
+    apt-get -y -qq install libfontconfig libxtst6 screen xvfb libxcursor1 ca-certificates bzip2 psmisc libglib2.0-0 less cron-apt python python3 iproute2 dbus libnss3 libegl1-mesa x11-xkb-utils libasound2 libxcomposite-dev libxi6 libpci3 libxslt1.1 libxkbcommon0 libxss1 >/dev/null
     update-ca-certificates >/dev/null
   fi
 
@@ -499,23 +480,7 @@ if [ "$INSTALL" == "Updt" ]; then
   SINUSBOTUSER=$(ls -ld $LOCATION | awk '{print $3}')
   sed -i "s|TS3Path = \"\"|TS3Path = \"$LOCATION/teamspeak3-client/ts3client_linux_amd64\"|g" $LOCATION/config.ini && greenMessage "Added TS3 Path to config." || redMessage "Error while updating config"
 else
-
-  cyanMessage 'Please enter the name of the sinusbot user. Typically "sinusbot". If it does not exists, the installer will create it.'
-
-  SINUSBOTUSER=""
-  while [[ ! $SINUSBOTUSER ]]; do
-    read -rp "Username [sinusbot]: " SINUSBOTUSER
-    if [ -z "$SINUSBOTUSER" ]; then
-      SINUSBOTUSER=sinusbot
-    fi
-    if [ $SINUSBOTUSER == "root" ]; then
-      redMessage "Error. Your username is invalid. Don't use root"!
-      SINUSBOTUSER=""
-    fi
-    if [ -n "$SINUSBOTUSER" ]; then
-      greenMessage "Your sinusbot user is: $SINUSBOTUSER"
-    fi
-  done
+  SINUSBOTUSER=sinusbot
 
   if [ "$(id $SINUSBOTUSER 2>/dev/null)" == "" ]; then
     if [ -d /home/$SINUSBOTUSER ]; then
@@ -646,7 +611,7 @@ if [[ "$USE_SYSTEMD" == true ]]; then
   systemctl daemon-reload
   systemctl enable sinusbot.service
 
-  greenMessage 'Installed systemd file to start the SinusBot with "service sinusbot {start|stop|status|restart}"'
+  cyanMessage 'Installed systemd file to start the SinusBot with "service sinusbot {start|stop|status|restart}"'
 
 elif [[ "$USE_SYSTEMD" == false ]]; then
 
@@ -727,38 +692,7 @@ fi
 
   chmod a+rx /usr/local/bin/yt-dlp
 
-  yt-dlp -U --restrict-filename
-
-
-# Creating Readme
-
-if [ ! -a "$LOCATION/README_installer.txt" ] && [ "$USE_SYSTEMD" == true ]; then
-  echo '##################################################################################
-# #
-# Usage: service sinusbot {start|stop|status|restart} #
-# - start: start the bot #
-# - stop: stop the bot #
-# - status: display the status of the bot (down or up) #
-# - restart: restart the bot #
-# #
-##################################################################################' >>$LOCATION/README_installer.txt
-elif [ ! -a "$LOCATION/README_installer.txt" ] && [ "$USE_SYSTEMD" == false ]; then
-  echo '##################################################################################
-  # #
-  # Usage: /etc/init.d/sinusbot {start|stop|status|restart|console|update|backup} #
-  # - start: start the bot #
-  # - stop: stop the bot #
-  # - status: display the status of the bot (down or up) #
-  # - restart: restart the bot #
-  # - console: display the bot console #
-  # - update: runs the bot updater (with start & stop)
-  # - backup: archives your bot root directory
-  # To exit the console without stopping the server, press CTRL + A then D. #
-  # #
-  ##################################################################################' >>$LOCATION/README_installer.txt
-fi
-
-greenMessage "Generated README_installer.txt"!
+  #yt-dlp -U --restrict-filename
 
 # Delete files if exists
 
@@ -838,10 +772,6 @@ if [[ "$IS_RUNNING" == true ]]; then
     greenMessage "Update done"!
   fi
 
-  if [[ ! -f $LOCATION/README_installer.txt ]]; then
-    yellowMessage "Generated a README_installer.txt in $LOCATION with all commands for the sinusbot..."
-  fi
-
   if [[ $INSTALL == "Updt" ]]; then
     if [[ -f /lib/systemd/system/sinusbot.service ]]; then
       service sinusbot restart
@@ -860,7 +790,6 @@ if [[ "$IS_RUNNING" == true ]]; then
   elif [[ "$USE_SYSTEMD" == false ]]; then
     redMessage 'Stop it with "/etc/init.d/sinusbot stop".'
   fi
-  magentaMessage "Don't forget to rate this script on: https://forum.sinusbot.com/resources/sinusbot-installer-script.58/"
   greenMessage "Thank you for using this script! :)"
 
 else
