@@ -860,7 +860,7 @@ if [[ $VERSION == '3.1.10' && "$DISCORD" == "false" ]]; then
   su -c "tar -xjf sinusbot-1.0.0-alpha.4-311d85f.tar.bz2" $SINUSBOTUSER
   rm -f sinusbot-1.0.0-alpha.4-311d85f.tar.bz2
 
-  wget -q https://raw.githubusercontent.com/mirarus/sinusbot-installer-linux/master/Youtube_Search.js scripts
+  #wget -q https://raw.githubusercontent.com/mirarus/sinusbot-installer-linux/master/Youtube_Search.js scripts
 
   if [ ! -d teamspeak3-client/plugins/ ]; then
      mkdir teamspeak3-client/plugins/
@@ -885,7 +885,7 @@ if [ $VERSION == '3.5.3' ]; then
   su -c "tar -xjf sinusbot.current.tar.bz2" $SINUSBOTUSER
   rm -f sinusbot.current.tar.bz2
 
-  wget -q https://raw.githubusercontent.com/mirarus/sinusbot-installer-linux/master/Youtube_Search.js scripts
+  #wget -q https://raw.githubusercontent.com/mirarus/sinusbot-installer-linux/master/Youtube_Search.js scripts
 
   if [ "$DISCORD" == "false" ]; then
 
