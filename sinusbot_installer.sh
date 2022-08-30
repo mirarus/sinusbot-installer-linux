@@ -51,7 +51,7 @@ function makeDir() {
 }
 
 err_report() {
-  FAILED_COMMAND=$(wget -q -O - https://raw.githubusercontent.com/Sinusbot/installer-linux/master/sinusbot_installer.sh | sed -e "$1q;d")
+  FAILED_COMMAND=$(wget -q -O - https://raw.githubusercontent.com/mirarus/sinusbot-installer-linux/master/sinusbot_installer.sh | sed -e "$1q;d")
   FAILED_COMMAND=${FAILED_COMMAND/ -qq}
   FAILED_COMMAND=${FAILED_COMMAND/ -q}
   FAILED_COMMAND=${FAILED_COMMAND/ -s}
@@ -59,7 +59,7 @@ err_report() {
   FAILED_COMMAND=${FAILED_COMMAND/ 2\>&1}
   FAILED_COMMAND=${FAILED_COMMAND/ \>\/dev\/null}
   if [[ "$FAILED_COMMAND" == "" ]]; then
-    redMessage "Failed command: https://github.com/Sinusbot/installer-linux/blob/master/sinusbot_installer.sh#L""$1"
+    redMessage "Failed command: https://github.com/mirarus/sinusbot-installer-linux/blob/master/sinusbot_installer.sh#L""$1"
   else
     redMessage "Command which failed was: \"${FAILED_COMMAND}\". Please try to exfecute it manually and attach the output to the bug report in the forum thread."
   fi
@@ -395,7 +395,7 @@ fi
 
   greenMessage "Searching latest TS3-Client build for hardware type $MACHINE with arch $ARCH."
 
-  VERSION="3.5.6"
+  VERSION="3.5.3"
 
   DOWNLOAD_URL_VERSION="https://files.teamspeak-services.com/releases/client/$VERSION/TeamSpeak3-Client-linux_$ARCH-$VERSION.run"
   STATUS=$(wget --server-response -L $DOWNLOAD_URL_VERSION 2>&1 | awk '/^  HTTP/{print $2}')
