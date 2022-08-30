@@ -962,7 +962,11 @@ cd $LOCATION
 
 if [ "$INSTALL" == "Inst" ]; then
   	
-  wget -q --no-check-certificate https://raw.githubusercontent.com/mirarus/sinusbot-installer-linux/master/Youtube_Search.js -P $LOCATION/scripts >/dev/null 2>&1
+  cd $LOCATION/scripts
+
+  wget -q https://raw.githubusercontent.com/mirarus/sinusbot-installer-linux/master/Youtube_Search.js
+
+  cd $LOCATION
 
   if [ "$DISCORD" == "false" ]; then
     if [[ ! -f $LOCATION/config.ini ]]; then
