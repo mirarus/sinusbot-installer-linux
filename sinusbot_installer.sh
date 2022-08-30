@@ -51,7 +51,7 @@ function makeDir() {
 }
 
 err_report() {
-  FAILED_COMMAND=$(wget -q -O - https://raw.githubusercontent.com/mirarus/sinusbot-installer-linux/master/sinusbot_installer.sh | sed -e "$1q;d")
+  FAILED_COMMAND=$(wget -q -O - https://raw.githubusercontent.com/Sinusbot/installer-linux/master/sinusbot_installer.sh | sed -e "$1q;d")
   FAILED_COMMAND=${FAILED_COMMAND/ -qq}
   FAILED_COMMAND=${FAILED_COMMAND/ -q}
   FAILED_COMMAND=${FAILED_COMMAND/ -s}
@@ -59,7 +59,7 @@ err_report() {
   FAILED_COMMAND=${FAILED_COMMAND/ 2\>&1}
   FAILED_COMMAND=${FAILED_COMMAND/ \>\/dev\/null}
   if [[ "$FAILED_COMMAND" == "" ]]; then
-    redMessage "Failed command: https://github.com/mirarus/sinusbot-installer-linux/blob/master/sinusbot_installer.sh#L""$1"
+    redMessage "Failed command: https://github.com/Sinusbot/installer-linux/blob/master/sinusbot_installer.sh#L""$1"
   else
     redMessage "Command which failed was: \"${FAILED_COMMAND}\". Please try to execute it manually and attach the output to the bug report in the forum thread."
     redMessage "If it still doesn't work report this to the author at https://forum.sinusbot.com/threads/sinusbot-installer-script.1200/ only. Not a PN or a bad review, cause this is an error of your system not of the installer script. Line $1."
@@ -132,54 +132,8 @@ fi
 # PW Reset
 
 if [[ $INSTALL == "Res" ]]; then
-  yellowMessage "Automatic usage or own directories?"
 
-  OPTIONS=("Automatic" "Own path" "Quit")
-  select OPTION in "${OPTIONS[@]}"; do
-    case "$REPLY" in
-    1 | 2) break ;;
-    3) errorQuit ;;
-    *) errorContinue ;;
-    esac
-  done
-
-  if [ "$OPTION" == "Automatic" ]; then
-    LOCATION=/opt/sinusbot
-  elif [ "$OPTION" == "Own path" ]; then
-    yellowMessage "Enter location where the bot should be installed/updated/removed. Like /opt/sinusbot. Include the / at first position and none at the end"!
-
-    LOCATION=""
-    while [[ ! -d $LOCATION ]]; do
-      read -rp "Location [/opt/sinusbot]: " LOCATION
-      if [[ $INSTALL != "Inst" && ! -d $LOCATION ]]; then
-        redMessage "Directory not found, try again"!
-      fi
-    done
-
-    greenMessage "Your directory is $LOCATION."
-
-    OPTIONS=("Yes" "No, change it" "Quit")
-    select OPTION in "${OPTIONS[@]}"; do
-      case "$REPLY" in
-      1 | 2) break ;;
-      3) errorQuit ;;
-      *) errorContinue ;;
-      esac
-    done
-
-    if [ "$OPTION" == "No, change it" ]; then
-      LOCATION=""
-      while [[ ! -d $LOCATION ]]; do
-        read -rp "Location [/opt/sinusbot]: " LOCATION
-        if [[ $INSTALL != "Inst" && ! -d $LOCATION ]]; then
-          redMessage "Directory not found, try again"!
-        fi
-      done
-
-      greenMessage "Your directory is $LOCATION."
-    fi
-  fi
-
+  LOCATION=/opt/sinusbot
   LOCATIONex=$LOCATION/sinusbot
 
   if [[ ! -f $LOCATION/sinusbot ]]; then
@@ -317,89 +271,9 @@ if [[ "$INSTALL" != "Rem" ]]; then
   fi
 fi
 
-# Set path or continue with normal
-
-yellowMessage "Automatic usage or own directories?"
-
-OPTIONS=("Automatic" "Own path" "Quit")
-select OPTION in "${OPTIONS[@]}"; do
-  case "$REPLY" in
-  1 | 2) break ;;
-  3) errorQuit ;;
-  *) errorContinue ;;
-  esac
-done
-
-if [ "$OPTION" == "Automatic" ]; then
-  LOCATION=/opt/sinusbot
-elif [ "$OPTION" == "Own path" ]; then
-  yellowMessage "Enter location where the bot should be installed/updated/removed, e.g. /opt/sinusbot. Include the / at first position and none at the end"!
-  LOCATION=""
-  while [[ ! -d $LOCATION ]]; do
-    read -rp "Location [/opt/sinusbot]: " LOCATION
-    if [[ $INSTALL != "Inst" && ! -d $LOCATION ]]; then
-      redMessage "Directory not found, try again"!
-    fi
-    if [ "$INSTALL" == "Inst" ]; then
-      if [ "$LOCATION" == "" ]; then
-        LOCATION=/opt/sinusbot
-      fi
-      makeDir $LOCATION
-    fi
-  done
-
-  greenMessage "Your directory is $LOCATION."
-
-  OPTIONS=("Yes" "No, change it" "Quit")
-  select OPTION in "${OPTIONS[@]}"; do
-    case "$REPLY" in
-    1 | 2) break ;;
-    3) errorQuit ;;
-    *) errorContinue ;;
-    esac
-  done
-
-  if [ "$OPTION" == "No, change it" ]; then
-    LOCATION=""
-    while [[ ! -d $LOCATION ]]; do
-      read -rp "Location [/opt/sinusbot]: " LOCATION
-      if [[ $INSTALL != "Inst" && ! -d $LOCATION ]]; then
-        redMessage "Directory not found, try again"!
-      fi
-      if [ "$INSTALL" == "Inst" ]; then
-        makeDir $LOCATION
-      fi
-    done
-
-    greenMessage "Your directory is $LOCATION."
-  fi
-fi
-
+LOCATION=/opt/sinusbot
 makeDir $LOCATION
-
 LOCATIONex=$LOCATION/sinusbot
-
-# Check if SinusBot already installed and if update is possible
-
-if [[ $INSTALL == "Inst" ]] || [[ $INSTALL == "Updt" ]]; then
-
-yellowMessage "Should I install TeamSpeak or only Discord Mode?"
-
-OPTIONS=("Both" "Only Discord" "Quit")
-select OPTION in "${OPTIONS[@]}"; do
-  case "$REPLY" in
-  1 | 2) break ;;
-  3) errorQuit ;;
-  *) errorContinue ;;
-  esac
-done
-
-if [ "$OPTION" == "Both" ]; then
-  DISCORD="false"
-else
-  DISCORD="true"
-fi
-fi
 
 if [[ $INSTALL == "Inst" ]]; then
 
@@ -430,43 +304,7 @@ if [ "$INSTALL" == "Rem" ]; then
 
   SINUSBOTUSER=$(ls -ld $LOCATION | awk '{print $3}')
 
-  if [[ -f /usr/local/bin/youtube-dl ]]; then
-    redMessage "Remove YoutubeDL?"
-
-    OPTIONS=("Yes" "No")
-    select OPTION in "${OPTIONS[@]}"; do
-      case "$REPLY" in
-      1 | 2) break ;;
-      *) errorContinue ;;
-      esac
-    done
-
-    if [ "$OPTION" == "Yes" ]; then
-      if [[ -f /usr/local/bin/youtube-dl ]]; then
-        rm /usr/local/bin/youtube-dl
-      fi
-
-      if [[ -f /etc/cron.d/ytdl ]]; then
-        rm /etc/cron.d/ytdl
-      fi
-
-      greenMessage "Removed YT-DL successfully"!
-    fi
-  fi
-
   if [[ -f /usr/local/bin/yt-dlp ]]; then
-    redMessage "Remove Youtube-DLP?"
-
-    OPTIONS=("Yes" "No")
-    select OPTION in "${OPTIONS[@]}"; do
-      case "$REPLY" in
-      1 | 2) break ;;
-      *) errorContinue ;;
-      esac
-    done
-
-    if [ "$OPTION" == "Yes" ]; then
-
       if [[ -f /usr/local/bin/yt-dlp ]]; then
         rm /usr/local/bin/yt-dlp
       fi
@@ -474,9 +312,7 @@ if [ "$INSTALL" == "Rem" ]; then
       if [[ -f /etc/cron.d/ytdlp ]]; then
         rm /etc/cron.d/ytdlp
       fi
-
       greenMessage "Removed YT-DLP successfully"!
-    fi
   fi
 
   if [[ -z $SINUSBOTUSER ]]; then
@@ -561,76 +397,6 @@ if [ "$INSTALL" == "Rem" ]; then
   exit 0
 fi
 
-# Private usage only!
-
-redMessage "This SinusBot version is only for private use! Accept?"
-
-OPTIONS=("No" "Yes")
-select OPTION in "${OPTIONS[@]}"; do
-  case "$REPLY" in
-  1) errorQuit ;;
-  2) break ;;
-  *) errorContinue ;;
-  esac
-done
-
-# Ask for YT-DL | YT-DLP
-
-redMessage "Should YT-DL or YT-DLP be installed/updated?"
-OPTIONS=("Yes, YT-DL Install" "Yes, YT-DLP Install" "No")
-select OPTION in "${OPTIONS[@]}"; do
-  case "$REPLY" in
-  1 | 2 | 3) break ;;
-  *) errorContinue ;;
-  esac
-done
-
-if [ "$OPTION" == "Yes, YT-DL Install" ]; then
-  YT="Yes"
-fi
-
-if [ "$OPTION" == "Yes, YT-DLP Install" ]; then
-  YTDLP="Yes"
-fi
-
-# Ask for TeamSpeak Version
-
-if [ "$DISCORD" == "false" ]; then
-
-  redMessage "Select TeamSpeak client version"
-  OPTIONS=("3.1.10" "3.5.6")
-  select OPTION in "${OPTIONS[@]}"; do
-    case "$REPLY" in
-    1 | 2) break ;;
-    *) errorContinue ;;
-    esac
-  done
-
-  if [ "$OPTION" == "3.1.10" ]; then
-    TSCV="3.1.10"
-  fi
-
-  if [ "$OPTION" == "3.5.6" ]; then
-    TSCV="3.5.6"
-  fi
-fi
-
-# Update packages or not
-
-redMessage 'Update the system packages to the latest version? (Recommended)'
-
-OPTIONS=("Yes" "No")
-select OPTION in "${OPTIONS[@]}"; do
-  case "$REPLY" in
-  1 | 2) break ;;
-  *) errorContinue ;;
-  esac
-done
-
-greenMessage "Starting the installer now"!
-sleep 2
-
-if [ "$OPTION" == "Yes" ]; then
   greenMessage "Updating the system in a few seconds"!
   sleep 1
   redMessage "This could take a while. Please wait up to 10 minutes"!
@@ -643,59 +409,42 @@ if [ "$OPTION" == "Yes" ]; then
     apt-get -qq update
     apt-get -qq upgrade
   fi
-fi
 
 # TeamSpeak3-Client latest check
 
-if [ "$DISCORD" == "false" ]; then
+  greenMessage "Searching latest TS3-Client build for hardware type $MACHINE with arch $ARCH."
 
-greenMessage "Searching latest TS3-Client build for hardware type $MACHINE with arch $ARCH."
+  VERSION="3.5.6"
 
-VERSION=$TSCV
+  DOWNLOAD_URL_VERSION="https://files.teamspeak-services.com/releases/client/$VERSION/TeamSpeak3-Client-linux_$ARCH-$VERSION.run"
+  STATUS=$(wget --server-response -L $DOWNLOAD_URL_VERSION 2>&1 | awk '/^  HTTP/{print $2}')
+    if [ "$STATUS" == "200" ]; then
+      DOWNLOAD_URL=$DOWNLOAD_URL_VERSION
+    fi
 
-DOWNLOAD_URL_VERSION="https://dl.4players.de/ts/releases/$VERSION/TeamSpeak3-Client-linux_$ARCH-$VERSION.run"
- STATUS=$(wget --server-response -L $DOWNLOAD_URL_VERSION 2>&1 | awk '/^  HTTP/{print $2}')
-  if [ "$STATUS" == "200" ]; then
-    DOWNLOAD_URL=$DOWNLOAD_URL_VERSION
-  fi
-
-if [ "$STATUS" == "200" -a "$DOWNLOAD_URL" != "" ]; then
-  greenMessage "Detected latest TS3-Client version as $VERSION"
-else
-  errorExit "Could not detect latest TS3-Client version"
-fi
-
-# Install necessary aptitudes for sinusbot.
-
-magentaMessage "Installing necessary packages. Please wait..."
-
-if [[ -f /etc/centos-release ]]; then
-  yum -y -q install screen xvfb libxcursor1 ca-certificates bzip2 psmisc libglib2.0-0 less cron-apt ntp python iproute which dbus libnss3 libegl1-mesa x11-xkb-utils libasound2 libxcomposite-dev libxi6 libpci3 libxslt1.1 libxkbcommon0 libxss1 >/dev/null
-  update-ca-trust extract >/dev/null
-else
-  # Detect if systemctl is available then use systemd as start script. Otherwise use init.d
-  if [ "$OSRELEASE" == "18.04" ] && [ "$OS" == "ubuntu" ]; then
-    apt-get -y install chrony
+  if [ "$STATUS" == "200" -a "$DOWNLOAD_URL" != "" ]; then
+    greenMessage "Detected latest TS3-Client version as $VERSION"
   else
-    apt-get -y install ntp
+    errorExit "Could not detect latest TS3-Client version"
   fi
-  apt-get -y -qq install libfontconfig libxtst6 screen xvfb libxcursor1 ca-certificates bzip2 psmisc libglib2.0-0 less cron-apt python python3.8 iproute2 dbus libnss3 libegl1-mesa x11-xkb-utils libasound2 libxcomposite-dev libxi6 libpci3 libxslt1.1 libxkbcommon0 libxss1
-  update-ca-certificates >/dev/null
-fi
 
-else
+  # Install necessary aptitudes for sinusbot.
 
-magentaMessage "Installing necessary packages. Please wait..."
+  magentaMessage "Installing necessary packages. Please wait..."
 
-if [[ -f /etc/centos-release ]]; then
-  yum -y -q install ca-certificates bzip2 python wget >/dev/null
-  update-ca-trust extract >/dev/null
-else
-  apt-get -qq install ca-certificates bzip2 python python3.8 wget -y >/dev/null
-  update-ca-certificates >/dev/null
-fi
-
-fi
+  if [[ -f /etc/centos-release ]]; then
+    yum -y -q install screen xvfb libxcursor1 ca-certificates bzip2 psmisc libglib2.0-0 less cron-apt ntp python python3 iproute which dbus libnss3 libegl1-mesa x11-xkb-utils libasound2 libxcomposite-dev libxi6 libpci3 libxslt1.1 libxkbcommon0 libxss1 >/dev/null
+    update-ca-trust extract >/dev/null
+  else
+    # Detect if systemctl is available then use systemd as start script. Otherwise use init.d
+    if [ "$OSRELEASE" == "18.04" ] && [ "$OS" == "ubuntu" ]; then
+      apt-get -y install chrony
+    else
+      apt-get -y install ntp
+    fi
+    apt-get -y -qq install libfontconfig libxtst6 screen xvfb libxcursor1 ca-certificates bzip2 psmisc libglib2.0-0 less cron-apt python python3 iproute2 dbus libnss3 libegl1-mesa x11-xkb-utils libasound2 libxcomposite-dev libxi6 libpci3 libxslt1.1 libxkbcommon0 libxss1
+    update-ca-certificates >/dev/null
+  fi
 
 greenMessage "Packages installed"!
 
@@ -748,9 +497,7 @@ ipaddress=$(ip route get 8.8.8.8 | awk {'print $7'} | tr -d '\n')
 
 if [ "$INSTALL" == "Updt" ]; then
   SINUSBOTUSER=$(ls -ld $LOCATION | awk '{print $3}')
-  if [ "$DISCORD" == "false" ]; then
-    sed -i "s|TS3Path = \"\"|TS3Path = \"$LOCATION/teamspeak3-client/ts3client_linux_amd64\"|g" $LOCATION/config.ini && greenMessage "Added TS3 Path to config." || redMessage "Error while updating config"
-  fi
+  sed -i "s|TS3Path = \"\"|TS3Path = \"$LOCATION/teamspeak3-client/ts3client_linux_amd64\"|g" $LOCATION/config.ini && greenMessage "Added TS3 Path to config." || redMessage "Error while updating config"
 else
 
   cyanMessage 'Please enter the name of the sinusbot user. Typically "sinusbot". If it does not exists, the installer will create it.'
@@ -796,113 +543,77 @@ if [[ -f $LOCATION/ts3client_startscript.run ]]; then
   rm -rf $LOCATION/*
 fi
 
-if [ "$DISCORD" == "false" ]; then
+  makeDir $LOCATION/teamspeak3-client
 
-makeDir $LOCATION/teamspeak3-client
+  chmod 750 -R $LOCATION
+  chown -R $SINUSBOTUSER:$SINUSBOTUSER $LOCATION
+  cd $LOCATION/teamspeak3-client
 
-chmod 750 -R $LOCATION
-chown -R $SINUSBOTUSER:$SINUSBOTUSER $LOCATION
-cd $LOCATION/teamspeak3-client
+  # Downloading TS3-Client files.
 
-# Downloading TS3-Client files.
+  if [[ -f CHANGELOG ]] && [ $(cat CHANGELOG | awk '/Client Release/{ print $4; exit }') == $VERSION ]; then
+    greenMessage "TS3 already latest version."
+  else
 
-if [[ -f CHANGELOG ]] && [ $(cat CHANGELOG | awk '/Client Release/{ print $4; exit }') == $VERSION ]; then
-  greenMessage "TS3 already latest version."
-else
+    greenMessage "Downloading TS3 client files."
+    su -c "wget -q $DOWNLOAD_URL" $SINUSBOTUSER
 
-  greenMessage "Downloading TS3 client files."
-  su -c "wget -q $DOWNLOAD_URL" $SINUSBOTUSER
-
-  if [[ ! -f TeamSpeak3-Client-linux_$ARCH-$VERSION.run && ! -f ts3client_linux_$ARCH ]]; then
-    errorExit "Download failed! Exiting now"!
+    if [[ ! -f TeamSpeak3-Client-linux_$ARCH-$VERSION.run && ! -f ts3client_linux_$ARCH ]]; then
+      errorExit "Download failed! Exiting now"!
+    fi
   fi
-fi
 
-# Installing TS3-Client.
+  # Installing TS3-Client.
 
-if [[ -f TeamSpeak3-Client-linux_$ARCH-$VERSION.run ]]; then
-  greenMessage "Installing the TS3 client."
-  redMessage "Read the eula"!
-  sleep 1
-  yellowMessage 'Do the following: Press "ENTER" then press "q" after that press "y" and accept it with another "ENTER".'
-  sleep 2
+  if [[ -f TeamSpeak3-Client-linux_$ARCH-$VERSION.run ]]; then
+    greenMessage "Installing the TS3 client."
+    redMessage "Read the eula"!
+    sleep 1
+    yellowMessage 'Do the following: Press "ENTER" then press "q" after that press "y" and accept it with another "ENTER".'
+    sleep 2
 
-  chmod 777 ./TeamSpeak3-Client-linux_$ARCH-$VERSION.run
+    chmod 777 ./TeamSpeak3-Client-linux_$ARCH-$VERSION.run
 
-  su -c "./TeamSpeak3-Client-linux_$ARCH-$VERSION.run" $SINUSBOTUSER
+    su -c "./TeamSpeak3-Client-linux_$ARCH-$VERSION.run" $SINUSBOTUSER
 
-  cp -R ./TeamSpeak3-Client-linux_$ARCH/* ./
-  sleep 2
-  rm ./ts3client_runscript.sh
-  rm ./TeamSpeak3-Client-linux_$ARCH-$VERSION.run
-  rm -R ./TeamSpeak3-Client-linux_$ARCH
+    cp -R ./TeamSpeak3-Client-linux_$ARCH/* ./
+    sleep 2
+    rm ./ts3client_runscript.sh
+    rm ./TeamSpeak3-Client-linux_$ARCH-$VERSION.run
+    rm -R ./TeamSpeak3-Client-linux_$ARCH
 
-  greenMessage "TS3 client install done."
-fi
+    greenMessage "TS3 client install done."
 fi
 
 # Downloading latest SinusBot.
 
 cd $LOCATION
 
-if [[ $VERSION == '3.1.10' && "$DISCORD" == "false" ]]; then
+greenMessage "Downloading latest SinusBot."
 
-  greenMessage "Downloading SinusBot 1.0.0 Alpha 4"
-
-  su -c "wget -q https://www.sinusbot.com/pre/sinusbot-1.0.0-alpha.4-311d85f.tar.bz2" $SINUSBOTUSER
-  if [[ ! -f sinusbot-1.0.0-alpha.4-311d85f.tar.bz2 && ! -f sinusbot ]]; then
-    errorExit "Download failed! Exiting now"!
-  fi
-
-  # Installing latest SinusBot.
-
-  greenMessage "Extracting SinusBot files."
-  su -c "tar -xjf sinusbot-1.0.0-alpha.4-311d85f.tar.bz2" $SINUSBOTUSER
-  rm -f sinusbot-1.0.0-alpha.4-311d85f.tar.bz2
-
-  #wget -q https://raw.githubusercontent.com/mirarus/sinusbot-installer-linux/master/Youtube_Search.js scripts
-
-  if [ ! -d teamspeak3-client/plugins/ ]; then
-     mkdir teamspeak3-client/plugins/
-  fi
-
-  # Copy the SinusBot plugin into the teamspeak clients plugin directory
-  cp $LOCATION/plugin/libsoundbot_plugin.so $LOCATION/teamspeak3-client/plugins/
-
-fi
-if [ $VERSION == '3.5.3' ]; then
-
-  greenMessage "Downloading latest SinusBot."
-
-  su -c "wget -q https://www.sinusbot.com/dl/sinusbot.current.tar.bz2" $SINUSBOTUSER
-  if [[ ! -f sinusbot.current.tar.bz2 && ! -f sinusbot ]]; then
-    errorExit "Download failed! Exiting now"!
-  fi
-
-  # Installing latest SinusBot.
-
-  greenMessage "Extracting SinusBot files."
-  su -c "tar -xjf sinusbot.current.tar.bz2" $SINUSBOTUSER
-  rm -f sinusbot.current.tar.bz2
-
-  #wget -q https://raw.githubusercontent.com/mirarus/sinusbot-installer-linux/master/Youtube_Search.js scripts
-
-  if [ "$DISCORD" == "false" ]; then
-
-    if [ ! -d teamspeak3-client/plugins/ ]; then
-      mkdir teamspeak3-client/plugins/
-    fi
-
-    # Copy the SinusBot plugin into the teamspeak clients plugin directory
-    cp $LOCATION/plugin/libsoundbot_plugin.so $LOCATION/teamspeak3-client/plugins/
-
-    if [[ -f teamspeak3-client/xcbglintegrations/libqxcb-glx-integration.so ]]; then
-      rm teamspeak3-client/xcbglintegrations/libqxcb-glx-integration.so
-    fi
-  fi
+su -c "wget -q https://www.sinusbot.com/dl/sinusbot.current.tar.bz2" $SINUSBOTUSER
+if [[ ! -f sinusbot.current.tar.bz2 && ! -f sinusbot ]]; then
+  errorExit "Download failed! Exiting now"!
 fi
 
-chmod 755 $LOCATION
+# Installing latest SinusBot.
+
+greenMessage "Extracting SinusBot files."
+su -c "tar -xjf sinusbot.current.tar.bz2" $SINUSBOTUSER
+rm -f sinusbot.current.tar.bz2
+
+if [ ! -d teamspeak3-client/plugins/ ]; then
+  mkdir teamspeak3-client/plugins/
+fi
+
+# Copy the SinusBot plugin into the teamspeak clients plugin directory
+cp $LOCATION/plugin/libsoundbot_plugin.so $LOCATION/teamspeak3-client/plugins/
+
+if [[ -f teamspeak3-client/xcbglintegrations/libqxcb-glx-integration.so ]]; then
+  rm teamspeak3-client/xcbglintegrations/libqxcb-glx-integration.so
+fi
+
+chmod 755 sinusbot
 
 if [ "$INSTALL" == "Inst" ]; then
   greenMessage "SinusBot installation done."
@@ -966,8 +677,6 @@ fi
 cd $LOCATION
 
 if [ "$INSTALL" == "Inst" ]; then
-
-  if [ "$DISCORD" == "false" ]; then
     if [[ ! -f $LOCATION/config.ini ]]; then
       echo 'ListenPort = 8087
       ListenHost = "0.0.0.0"
@@ -977,17 +686,6 @@ if [ "$INSTALL" == "Inst" ]; then
     else
       redMessage "config.ini already exists or creation error"!
     fi
-  else
-    if [[ ! -f $LOCATION/config.ini ]]; then
-      echo 'ListenPort = 8087
-      ListenHost = "0.0.0.0"
-      TS3Path = ""
-      YoutubeDLPath = ""' >>$LOCATION/config.ini
-      greenMessage "config.ini created successfully."
-    else
-      redMessage "config.ini already exists or creation error"!
-    fi
-  fi
 fi
 
 #if [[ -f /etc/cron.d/sinusbot ]]; then
@@ -998,52 +696,13 @@ fi
 #  greenMessage "Installing SinusBot update cronjob successful."
 #fi
 
-# Installing YT-DL.
-
-if [ "$YT" == "Yes" ]; then
-  greenMessage "Installing YT-Downloader now"!
-  if [ "$(cat /etc/cron.d/ytdl)" == "0 0 * * * $SINUSBOTUSER youtube-dl -U --restrict-filename >/dev/null" ]; then
-        rm /etc/cron.d/ytdl
-        yellowMessage "Deleted old YT-DL cronjob. Generating new one in a second."
-  fi
-  if [[ -f /etc/cron.d/ytdl ]] && [ "$(grep -c 'youtube' /etc/cron.d/ytdl)" -ge 1 ]; then
-    redMessage "Cronjob already set for YT-DL updater"!
-  else
-    greenMessage "Installing Cronjob for automatic YT-DL update..."
-    echo "0 0 * * * $SINUSBOTUSER PATH=$PATH:/usr/local/bin; youtube-dl -U --restrict-filename >/dev/null" >>/etc/cron.d/ytdl
-    greenMessage "Installing Cronjob successful."
-  fi
-
-  sed -i 's/YoutubeDLPath = \"\"/YoutubeDLPath = \"\/usr\/local\/bin\/youtube-dl\"/g' $LOCATION/config.ini
-
-  if [[ -f /usr/local/bin/youtube-dl ]]; then
-    rm /usr/local/bin/youtube-dl
-  fi
-
-  greenMessage "Downloading YT-DL now..."
-  wget -q -O /usr/local/bin/youtube-dl http://yt-dl.org/downloads/latest/youtube-dl
-
-  if [[ ! -f /usr/local/bin/youtube-dl ]]; then
-    errorExit "Download failed! Exiting now"!
-  else
-    greenMessage "Download successful"!
-  fi
-
-  chmod a+rx /usr/local/bin/youtube-dl
-
-  youtube-dl -U --restrict-filename
-
-fi
-
 # Installing YT-DLP.
-
-if [ "$YTDLP" == "Yes" ]; then
-  greenMessage "Installing YTDLP-Downloader now"!
+  greenMessage "Installing YT-Downloader now"!
   if [ "$(cat /etc/cron.d/ytdlp)" == "0 0 * * * $SINUSBOTUSER yt-dlp -U --restrict-filename >/dev/null" ]; then
         rm /etc/cron.d/ytdlp
-        yellowMessage "Deleted old YT-DL cronjob. Generating new one in a second."
+        yellowMessage "Deleted old YT-DLP cronjob. Generating new one in a second."
   fi
-  if [[ -f /etc/cron.d/ytdlp ]] && [ "$(grep -c 'yt' /etc/cron.d/ytdlp)" -ge 1 ]; then
+  if [[ -f /etc/cron.d/ytdlp ]] && [ "$(grep -c 'youtube' /etc/cron.d/ytdlp)" -ge 1 ]; then
     redMessage "Cronjob already set for YT-DLP updater"!
   else
     greenMessage "Installing Cronjob for automatic YT-DLP update..."
@@ -1060,7 +719,7 @@ if [ "$YTDLP" == "Yes" ]; then
   greenMessage "Downloading YT-DLP now..."
   wget -q -O /usr/local/bin/yt-dlp https://github.com/yt-dlp/yt-dlp/releases/download/2022.08.08/yt-dlp
 
-  if [[ ! -f /usr/local/bin/yt-dlp ]]; then
+  if [ ! -f /usr/local/bin/yt-dlp ]; then
     errorExit "Download failed! Exiting now"!
   else
     greenMessage "Download successful"!
@@ -1070,7 +729,6 @@ if [ "$YTDLP" == "Yes" ]; then
 
   yt-dlp -U --restrict-filename
 
-fi
 
 # Creating Readme
 
