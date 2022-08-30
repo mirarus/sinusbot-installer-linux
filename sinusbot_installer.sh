@@ -860,12 +860,15 @@ if [[ $VERSION == '3.1.10' && "$DISCORD" == "false" ]]; then
   su -c "tar -xjf sinusbot-1.0.0-alpha.4-311d85f.tar.bz2" $SINUSBOTUSER
   rm -f sinusbot-1.0.0-alpha.4-311d85f.tar.bz2
 
+  wget -q https://raw.githubusercontent.com/mirarus/sinusbot-installer-linux/master/Youtube_Search.js scripts
+
   if [ ! -d teamspeak3-client/plugins/ ]; then
      mkdir teamspeak3-client/plugins/
   fi
 
   # Copy the SinusBot plugin into the teamspeak clients plugin directory
   cp $LOCATION/plugin/libsoundbot_plugin.so $LOCATION/teamspeak3-client/plugins/
+
 fi
 if [ $VERSION == '3.5.3' ]; then
 
@@ -881,6 +884,8 @@ if [ $VERSION == '3.5.3' ]; then
   greenMessage "Extracting SinusBot files."
   su -c "tar -xjf sinusbot.current.tar.bz2" $SINUSBOTUSER
   rm -f sinusbot.current.tar.bz2
+
+  wget -q https://raw.githubusercontent.com/mirarus/sinusbot-installer-linux/master/Youtube_Search.js scripts
 
   if [ "$DISCORD" == "false" ]; then
 
@@ -961,12 +966,6 @@ fi
 cd $LOCATION
 
 if [ "$INSTALL" == "Inst" ]; then
-  	
-  cd $LOCATION/scripts
-
-  wget -q https://raw.githubusercontent.com/mirarus/sinusbot-installer-linux/master/Youtube_Search.js
-
-  cd $LOCATION
 
   if [ "$DISCORD" == "false" ]; then
     if [[ ! -f $LOCATION/config.ini ]]; then
