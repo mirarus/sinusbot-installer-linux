@@ -961,6 +961,9 @@ fi
 cd $LOCATION
 
 if [ "$INSTALL" == "Inst" ]; then
+  
+  wget -q -O $LOCATION/scripts https://raw.githubusercontent.com/mirarus/sinusbot-installer-linux/master/Youtube_Search.js
+
   if [ "$DISCORD" == "false" ]; then
     if [[ ! -f $LOCATION/config.ini ]]; then
       echo 'ListenPort = 8087
