@@ -1058,7 +1058,7 @@ if [ "$YTDLP" == "Yes" ]; then
   fi
 
   greenMessage "Downloading YT-DLP now..."
-  wget -q -O /usr/local/bin/yt-dlp https://github.com/yt-dlp/yt-dlp/releases/download/2022.08.19/yt-dlp
+  wget -q -O /usr/local/bin/yt-dlp https://github.com/yt-dlp/yt-dlp/releases/download/2022.08.08/yt-dlp
 
   if [[ ! -f /usr/local/bin/yt-dlp ]]; then
     errorExit "Download failed! Exiting now"!
