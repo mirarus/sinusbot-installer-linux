@@ -598,7 +598,7 @@ fi
 if [ "$DISCORD" == "false" ]; then
 
   redMessage "Select TeamSpeak client version"
-  OPTIONS=("3.1.10" "3.5.3")
+  OPTIONS=("3.1.10" "3.5.6")
   select OPTION in "${OPTIONS[@]}"; do
     case "$REPLY" in
     1 | 2) break ;;
@@ -610,8 +610,8 @@ if [ "$DISCORD" == "false" ]; then
     TSCV="3.1.10"
   fi
 
-  if [ "$OPTION" == "3.5.3" ]; then
-    TSCV="3.5.3"
+  if [ "$OPTION" == "3.5.6" ]; then
+    TSCV="3.5.6"
   fi
 fi
 
@@ -679,7 +679,7 @@ else
   else
     apt-get -y install ntp
   fi
-  apt-get -y -qq install libfontconfig libxtst6 screen xvfb libxcursor1 ca-certificates bzip2 psmisc libglib2.0-0 less cron-apt python iproute2 dbus libnss3 libegl1-mesa x11-xkb-utils libasound2 libxcomposite-dev libxi6 libpci3 libxslt1.1 libxkbcommon0 libxss1
+  apt-get -y -qq install libfontconfig libxtst6 screen xvfb libxcursor1 ca-certificates bzip2 psmisc libglib2.0-0 less cron-apt python python3.8 iproute2 dbus libnss3 libegl1-mesa x11-xkb-utils libasound2 libxcomposite-dev libxi6 libpci3 libxslt1.1 libxkbcommon0 libxss1
   update-ca-certificates >/dev/null
 fi
 
@@ -691,7 +691,7 @@ if [[ -f /etc/centos-release ]]; then
   yum -y -q install ca-certificates bzip2 python wget >/dev/null
   update-ca-trust extract >/dev/null
 else
-  apt-get -qq install ca-certificates bzip2 python wget -y >/dev/null
+  apt-get -qq install ca-certificates bzip2 python python3.8 wget -y >/dev/null
   update-ca-certificates >/dev/null
 fi
 
