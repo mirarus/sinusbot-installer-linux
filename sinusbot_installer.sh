@@ -897,7 +897,7 @@ if [ $VERSION == '3.5.3' ]; then
   fi
 fi
 
-chmod 755 $LOCATION/sinusbot
+chmod 755 $LOCATION
 
 if [ "$INSTALL" == "Inst" ]; then
   greenMessage "SinusBot installation done."
