@@ -77,9 +77,9 @@ fi
 
 redMessage "Checking for the latest installer version"
 if [[ -f /etc/centos-release ]]; then
-  yum -y -q install wget
+  yum -y -q install wget >/dev/null
 else
-  apt-get -qq install wget -y
+  apt-get -qq install wget -y >/dev/null
 fi
 
 # Detect if systemctl is available then use systemd as start script. Otherwise use init.d
@@ -202,9 +202,9 @@ if [ "$INSTALL" != "Rem" ]; then
 
   if [[ -f /etc/debian_version ]]; then
     greenMessage "Check if lsb-release and debconf-utils is installed..."
-    apt-get -qq update
-    apt-get -qq install debconf-utils -y
-    apt-get -qq install lsb-release -y
+    apt-get -qq update >/dev/null
+    apt-get -qq install debconf-utils -y >/dev/null
+    apt-get -qq install lsb-release -y >/dev/null
     greenMessage "Done"!
   fi
 
@@ -384,11 +384,11 @@ fi
   sleep 3
 
   if [[ -f /etc/centos-release ]]; then
-    yum -y -q update
-    yum -y -q upgrade
+    yum -y -q update >/dev/null
+    yum -y -q upgrade >/dev/null
   else
-    apt-get -qq update
-    apt-get -qq upgrade
+    apt-get -qq update >/dev/null
+    apt-get -qq upgrade >/dev/null
   fi
 
 # TeamSpeak3-Client latest check
