@@ -398,7 +398,7 @@ fi
   VERSION="3.5.3"
 
   DOWNLOAD_URL_VERSION="https://files.teamspeak-services.com/releases/client/$VERSION/TeamSpeak3-Client-linux_$ARCH-$VERSION.run"
-  STATUS=$(wget --server-response -L $DOWNLOAD_URL_VERSION 2>&1 | awk '/^  HTTP/{print $2}')
+  STATUS=$(wget --spider -S $DOWNLOAD_URL_VERSION 2>&1 | awk '/^  HTTP/{print $2}')
     if [ "$STATUS" == "200" ]; then
       DOWNLOAD_URL=$DOWNLOAD_URL_VERSION
     fi
@@ -408,7 +408,6 @@ fi
   else
     errorExit "Could not detect latest TS3-Client version"
   fi
-  rm -rf TeamSpeak3-Client-linux_$ARCH-$VERSION.run
 
   # Install necessary aptitudes for sinusbot.
 
