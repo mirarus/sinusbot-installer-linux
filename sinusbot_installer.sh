@@ -408,6 +408,7 @@ fi
   else
     errorExit "Could not detect latest TS3-Client version"
   fi
+  rm -rf TeamSpeak3-Client-linux_$ARCH-$VERSION.run
 
   # Install necessary aptitudes for sinusbot.
 
