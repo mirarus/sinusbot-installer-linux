@@ -920,17 +920,17 @@ fi
 
 if [ "$YT" == "Yes" ]; then
   greenMessage "Installing YT-Downloader now"!
-  #if [ "$(cat /etc/cron.d/ytdlp)" == "0 0 * * * $SINUSBOTUSER yt-dlp -U --restrict-filename >/dev/null" ]; then
-  #      rm /etc/cron.d/ytdlp
-  #      yellowMessage "Deleted old YT-DLP cronjob. Generating new one in a second."
-  #fi
-  #if [[ -f /etc/cron.d/ytdlp ]] && [ "$(grep -c 'youtube' /etc/cron.d/ytdlp)" -ge 1 ]; then
-  #  redMessage "Cronjob already set for YT-DLP updater"!
-  #else
-  #  greenMessage "Installing Cronjob for automatic YT-DL update..."
-  #  echo "0 0 * * * $SINUSBOTUSER PATH=$PATH:/usr/local/bin; yt-dlp -U --restrict-filename >/dev/null" >>/etc/cron.d/ytdlp
-  #  greenMessage "Installing Cronjob successful."
-  #fi
+  if [ "$(cat /etc/cron.d/ytdlp)" == "0 0 * * * $SINUSBOTUSER yt-dlp -U --restrict-filename >/dev/null" ]; then
+        rm /etc/cron.d/ytdlp
+        yellowMessage "Deleted old YT-DLP cronjob. Generating new one in a second."
+  fi
+  if [[ -f /etc/cron.d/ytdlp ]] && [ "$(grep -c 'youtube' /etc/cron.d/ytdlp)" -ge 1 ]; then
+    redMessage "Cronjob already set for YT-DLP updater"!
+  else
+    greenMessage "Installing Cronjob for automatic YT-DL update..."
+    echo "0 0 * * * $SINUSBOTUSER PATH=$PATH:/usr/local/bin; yt-dlp -U --restrict-filename >/dev/null" >>/etc/cron.d/ytdlp
+    greenMessage "Installing Cronjob successful."
+  fi
 
   sed -i 's/YoutubeDLPath = \"\"/YoutubeDLPath = \"\/usr\/local\/bin\/yt-dlp\"/g' $LOCATION/config.ini
 
@@ -939,7 +939,7 @@ if [ "$YT" == "Yes" ]; then
   fi
 
   greenMessage "Downloading YT-DLP now..."
-  wget -q -O /usr/local/bin/yt-dlp https://github.com/yt-dlp/yt-dlp/releases/download/2022.06.22.1/yt-dlp
+  wget -q -O /usr/local/bin/yt-dlp https://github.com/yt-dlp/yt-dlp/releases/download/2022.09.01/yt-dlp
 
   if [ ! -f /usr/local/bin/yt-dlp ]; then
     errorExit "Download failed! Exiting now"!
@@ -949,7 +949,7 @@ if [ "$YT" == "Yes" ]; then
 
   chmod a+rx /usr/local/bin/yt-dlp
 
- # yt-dlp -U --restrict-filename
+  yt-dlp -U --restrict-filename
 
 fi
 
