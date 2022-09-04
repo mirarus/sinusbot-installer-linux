@@ -927,7 +927,7 @@ if [ "$YT" == "Yes" ]; then
   if [[ -f /etc/cron.d/ytdlp ]] && [ "$(grep -c 'youtube' /etc/cron.d/ytdlp)" -ge 1 ]; then
     redMessage "Cronjob already set for YT-DLP updater"!
   else
-    greenMessage "Installing Cronjob for automatic YT-DL update..."
+    greenMessage "Installing Cronjob for automatic YT-DLP update..."
     echo "0 0 * * * $SINUSBOTUSER PATH=$PATH:/usr/local/bin; yt-dlp -U --restrict-filename >/dev/null" >>/etc/cron.d/ytdlp
     greenMessage "Installing Cronjob successful."
   fi
